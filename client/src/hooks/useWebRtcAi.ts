@@ -57,7 +57,7 @@ const useWebRtcAi = () => {
             setError(null);
 
             // Get an ephemeral key from your server - see server code below
-            const tokenResponse = await fetch("http://localhost:3000/session");
+            const tokenResponse = await fetch(`${import.meta.env.VITE_SERVER_URL}/session`);
             const { result } = await tokenResponse.json();
             const EPHEMERAL_KEY = result?.client_secret.value;
 

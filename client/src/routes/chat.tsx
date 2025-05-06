@@ -187,7 +187,7 @@ export default function ChatPage() {
             </div> */}
             
             {/* <ScrollArea className="flex-1 p-4"> */}
-              <div className="space-y-4 overflow-y-auto max-h-100 border-1 p-2 mt-6 border-gray-300 rounded-lg">
+              <div className="space-y-4 overflow-y-auto max-h-100 min-h-100 border-1 p-2 mt-6 border-gray-300 rounded-lg">
                 {messages.map(renderMessage)}
                 {processingMessage && (
                   <div className="flex justify-start mb-4">
