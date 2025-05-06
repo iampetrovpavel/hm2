@@ -12,21 +12,21 @@ export function Navigation() {
       href: "/chat",
       icon: MessageSquare,
     },
-    {
-      name: "Requests",
-      href: "/requests",
-      icon: FileText,
-    },
-    {
-      name: "Quotes",
-      href: "/quotes",
-      icon: FileCheck,
-    },
-    {
-      name: "Orders",
-      href: "/orders",
-      icon: Package,
-    },
+    // {
+    //   name: "Requests",
+    //   href: "/requests",
+    //   icon: FileText,
+    // },
+    // {
+    //   name: "Quotes",
+    //   href: "/quotes",
+    //   icon: FileCheck,
+    // },
+    // {
+    //   name: "Orders",
+    //   href: "/orders",
+    //   icon: Package,
+    // },
   ]
 
   return (

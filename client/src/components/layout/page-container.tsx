@@ -11,7 +11,7 @@ interface PageContainerProps {
 
 export function PageContainer({ children, title, showBackButton = false, action }: PageContainerProps) {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-[calc(100vh-57px)]">
       <header style={{top: 57}} className="sticky z-10 border-b border-slate-300 shadow-md bg-background px-6 ">
         <div className="container flex h-14 items-center justify-between max-w-5xl mx-auto">
           <h1 className="text-xl font-semibold">{title}</h1>

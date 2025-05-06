@@ -1,10 +1,17 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 
-// OpenAI WebRTC API endpoint with authentication in URL
-// const DEFAULT_MODEL = 'pt-4o-realtime-preview-2024-12-17';
+export interface VoiceTranscription {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
 
-// const SERVER_URL = (import.meta as any).env.VITE_SERVER_URL || 'http://localhost:3000';
-
+interface DataChannelMessage {
+  type: string;
+  content?: string;
+  role?: string;
+  [key: string]: any;
+}
 
 const useWebRtcAi = () => {
     const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
@@ -12,61 +19,164 @@ const useWebRtcAi = () => {
     const dataChannelRef = useRef<RTCDataChannel | null>(null);
     const audioElementRef = useRef<HTMLAudioElement | null>(null);
 
+    const [isConnecting, setIsConnecting] = useState(false);
+    const [isConnected, setIsConnected] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [isListening, setIsListening] = useState(false);
+    const [transcription, setTranscription] = useState<VoiceTranscription[]>([]);
+
+    const onNewTranscription = useRef<(message: VoiceTranscription) => void>(() => {});
+
+    const setTranscriptionCallback = useCallback((callback: (message: VoiceTranscription) => void) => {
+        onNewTranscription.current = callback;
+    }, []);
+
+    // Send text message to be spoken by AI
+    const sendTextMessage = useCallback((text: string) => {
+        if (!dataChannelRef.current || dataChannelRef.current.readyState !== 'open') {
+            console.error("Data channel not available or not open");
+            return false;
+        }
+
+        try {
+            const message = {
+                type: "text",
+                text: text
+            };
+            dataChannelRef.current.send(JSON.stringify(message));
+            return true;
+        } catch (error) {
+            console.error("Error sending message via data channel:", error);
+            return false;
+        }
+    }, []);
+
     async function init() {
-        // Get an ephemeral key from your server - see server code below
-        const tokenResponse = await fetch("http://localhost:3000/session");
-        const { result } = await tokenResponse.json();
-        const EPHEMERAL_KEY = result?.client_secret.value;
+        try {
+            setIsConnecting(true);
+            setError(null);
 
-        // Create a peer connection
-        const pc = new RTCPeerConnection();
-        peerConnectionRef.current = pc;
+            // Get an ephemeral key from your server - see server code below
+            const tokenResponse = await fetch("http://localhost:3000/session");
+            const { result } = await tokenResponse.json();
+            const EPHEMERAL_KEY = result?.client_secret.value;
 
-        // Set up to play remote audio from the model
-        const audioEl = document.createElement("audio");
-        audioEl.autoplay = true;
-        audioElementRef.current = audioEl;
-        pc.ontrack = e => audioEl.srcObject = e.streams[0];
+            // Create a peer connection
+            const pc = new RTCPeerConnection({
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' }
+                ]
+            });
+            peerConnectionRef.current = pc;
 
-        // Add local audio track for microphone input in the browser
-        const ms = await navigator.mediaDevices.getUserMedia({
-            audio: true
-        });
-        mediaStreamRef.current = ms;
-        pc.addTrack(ms.getTracks()[0]);
+            // Connection state monitoring
+            pc.onconnectionstatechange = () => {
+                console.log("Connection state:", pc.connectionState);
+                if (pc.connectionState === 'connected') {
+                    setIsConnected(true);
+                    setIsConnecting(false);
+                } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+                    setIsConnected(false);
+                    setIsListening(false);
+                }
+            };
 
-        // Set up data channel for sending and receiving events
-        const dc = pc.createDataChannel("oai-events");
-        dataChannelRef.current = dc;
-        dc.addEventListener("message", (e) => {
-            // Realtime server events appear here!
-            const msg = JSON.parse(e.data);
-            console.log(msg);
-        });
+            // Set up to play remote audio from the model
+            const audioEl = document.createElement("audio");
+            audioEl.autoplay = true;
+            audioElementRef.current = audioEl;
+            pc.ontrack = e => audioEl.srcObject = e.streams[0];
 
-        // Start the session using the Session Description Protocol (SDP)
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
+            // Add local audio track for microphone input in the browser
+            const ms = await navigator.mediaDevices.getUserMedia({
+                audio: true
+            });
+            mediaStreamRef.current = ms;
+            pc.addTrack(ms.getTracks()[0]);
+            setIsListening(true);
 
-        const baseUrl = "https://api.openai.com/v1/realtime";
-        const model = "gpt-4o-mini-realtime-preview";
-        const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
-            method: "POST",
-            body: offer.sdp,
-            headers: {
-                Authorization: `Bearer ${EPHEMERAL_KEY}`,
-                "Content-Type": "application/sdp"
-            },
-        });
+            // Set up data channel for sending and receiving events
+            const dc = pc.createDataChannel("oai-events");
+            dataChannelRef.current = dc;
+            
+            dc.addEventListener("message", (e) => {
+                // Realtime server events appear here!
+                try {
+                    const msg: DataChannelMessage = JSON.parse(e.data);
+                    console.log(msg);
+                    
+                    if (msg.type === 'response.audio_transcript.done' && msg.transcript) {
+                        const newTranscription: VoiceTranscription = {
+                            role: msg.role as 'user' | 'assistant' || 'user',
+                            content: msg.transcript,
+                            timestamp: new Date()
+                        };
+                        
+                        setTranscription(prev => [...prev, newTranscription]);
+                        onNewTranscription.current(newTranscription);
+                    }
+                } catch (error) {
+                    console.error("Error parsing data channel message:", error);
+                }
+            });
 
-        const answer: RTCSessionDescriptionInit = {
-            type: "answer",
-            sdp: await sdpResponse.text(),
-        };
-        await pc.setRemoteDescription(answer);
+            // Start the session using the Session Description Protocol (SDP)
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+
+            const baseUrl = "https://api.openai.com/v1/realtime";
+            const model = "gpt-4o-mini-realtime-preview";
+            const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
+                method: "POST",
+                body: offer.sdp,
+                headers: {
+                    Authorization: `Bearer ${EPHEMERAL_KEY}`,
+                    "Content-Type": "application/sdp"
+                },
+            });
+
+            if (!sdpResponse.ok) {
+                const errorText = await sdpResponse.text();
+                throw new Error(`Failed to connect: ${errorText}`);
+            }
+
+            const answer: RTCSessionDescriptionInit = {
+                type: "answer",
+                sdp: await sdpResponse.text(),
+            };
+            await pc.setRemoteDescription(answer);
+        } catch (err) {
+            console.error("WebRTC initialization error:", err);
+            setError(err instanceof Error ? err.message : "Failed to initialize WebRTC connection");
+            setIsConnecting(false);
+            setIsConnected(false);
+            setIsListening(false);
+        }
     }
 
+    const toggleListening = useCallback(() => {
+        if (!mediaStreamRef.current || !isConnected) return;
+        
+        if (isListening) {
+            // Mute the microphone
+            mediaStreamRef.current.getTracks().forEach(track => {
+                track.enabled = false;
+            });
+            setIsListening(false);
+        } else {
+            // Unmute the microphone
+            mediaStreamRef.current.getTracks().forEach(track => {
+                track.enabled = true;
+            });
+            setIsListening(true);
+        }
+    }, [isConnected, isListening]);
+
     const disconnect = useCallback(() => {
+        setIsConnected(false);
+        setIsListening(false);
+        setIsConnecting(false);
+        
         // Close the data channel
         if (dataChannelRef.current) {
             dataChannelRef.current.close();
@@ -101,7 +211,18 @@ const useWebRtcAi = () => {
         };
     }, [disconnect]);
 
-    return { init, disconnect };
+    return { 
+        init, 
+        disconnect,
+        toggleListening,
+        setTranscriptionCallback,
+        sendTextMessage,
+        transcription,
+        isConnecting,
+        isConnected,
+        isListening,
+        error
+    };
 };
 
 export default useWebRtcAi;
