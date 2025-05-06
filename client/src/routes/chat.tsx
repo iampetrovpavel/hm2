@@ -23,7 +23,7 @@ export default function ChatPage() {
   const [activeTab, setActiveTab] = useState("text");
   const [processingMessage, setProcessingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   const {
     init,
     disconnect,
@@ -41,7 +41,7 @@ export default function ChatPage() {
   useEffect(() => {
     // Optional auto-initialize
     // init();
-    
+
     return () => {
       disconnect();
     };
@@ -70,7 +70,7 @@ export default function ChatPage() {
   // Send a text message
   const handleSendMessage = () => {
     if (!inputMessage.trim() || processingMessage) return;
-    
+
     const messageText = inputMessage.trim();
     const newMessage: Message = {
       id: uuidv4(),
@@ -78,11 +78,11 @@ export default function ChatPage() {
       content: messageText,
       timestamp: new Date()
     };
-    
+
     setMessages(prev => [...prev, newMessage]);
     setInputMessage("");
     setProcessingMessage(true);
-    
+
     // If WebRTC is connected, send the message to be spoken by the AI
     if (isConnected) {
       sendTextMessage(messageText);
@@ -113,18 +113,17 @@ export default function ChatPage() {
   // Render message bubble
   const renderMessage = (message: Message) => {
     const isUser = message.role === 'user';
-    
+
     return (
-      <div 
+      <div
         key={message.id}
         className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
       >
-        <div 
-          className={`max-w-[70%] rounded-lg p-3 ${
-            isUser 
-              ? 'bg-primary text-primary-foreground' 
+        <div
+          className={`max-w-[70%] rounded-lg p-3 ${isUser
+              ? 'bg-primary text-primary-foreground'
               : 'bg-muted text-foreground'
-          }`}
+            }`}
         >
           <p className="text-sm">{message.content}</p>
           <p className="text-xs opacity-70 mt-1">
@@ -139,7 +138,7 @@ export default function ChatPage() {
   const renderConnectionStatus = () => {
     let statusText = 'Not connected';
     let statusClass = 'bg-gray-500';
-    
+
     if (isConnecting) {
       statusText = 'Connecting...';
       statusClass = 'bg-yellow-500';
@@ -152,7 +151,7 @@ export default function ChatPage() {
         statusClass = 'bg-blue-500';
       }
     }
-    
+
     return (
       <div className="flex items-center gap-2 ml-auto mr-4">
         <div className={`w-2 h-2 rounded-full ${statusClass}`}></div>
@@ -164,8 +163,8 @@ export default function ChatPage() {
   return (
     <PageContainer title="Chat with AI">
       {/* <div className="flex flex-col p-10"> */}
-        {/* <div className="flex-1 overflow-hidden"> */}
-          {/* <Tabs 
+      {/* <div className="flex-1 overflow-hidden"> */}
+      {/* <Tabs 
             defaultValue="text" 
             className="h-full flex flex-col"
             value={activeTab}
@@ -185,26 +184,26 @@ export default function ChatPage() {
               
               {renderConnectionStatus()}
             </div> */}
-            
-            {/* <ScrollArea className="flex-1 p-4"> */}
-              <div className="space-y-4 overflow-y-auto max-h-100 min-h-100 border-1 p-2 mt-6 border-gray-300 rounded-lg">
-                {messages.map(renderMessage)}
-                {processingMessage && (
-                  <div className="flex justify-start mb-4">
-                    <div className="bg-muted text-foreground max-w-[70%] rounded-lg p-3">
-                      <div className="flex space-x-2">
-                        <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"></div>
-                        <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                        <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
+
+      {/* <ScrollArea className="flex-1 p-4"> */}
+      <div className="space-y-4 overflow-y-auto max-h-100 min-h-100 border-1 p-2 mt-6 border-gray-300 rounded-lg">
+        {messages.map(renderMessage)}
+        {processingMessage && (
+          <div className="flex justify-start mb-4">
+            <div className="bg-muted text-foreground max-w-[70%] rounded-lg p-3">
+              <div className="flex space-x-2">
+                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"></div>
+                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
               </div>
-            {/* </ScrollArea> */}
-            
-            {/* <TabsContent value="text" className="flex-none p-4 pt-0 mt-0">
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      {/* </ScrollArea> */}
+
+      {/* <TabsContent value="text" className="flex-none p-4 pt-0 mt-0">
               <div className="flex gap-2">
                 <Textarea
                   value={inputMessage}
@@ -227,64 +226,65 @@ export default function ChatPage() {
                 </Button>
               </div>
             </TabsContent> */}
-            
-            {/* <TabsContent value="voice" className="flex-none p-4 pt-0 mt-0 flex items-center justify-center">
+
+      {/* <TabsContent value="voice" className="flex-none p-4 pt-0 mt-0 flex items-center justify-center">
               {error && (
                 <Alert variant="destructive" className="mb-4 w-full">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )} */}
-              
-              <div className="flex flex-col items-center space-y-6 py-4">
-                <Button
-                  size="icon"
-                  className={`rounded-full w-20 h-20 ${
-                    isConnecting 
-                      ? 'bg-yellow-500 hover:bg-yellow-600' 
-                      : isConnected 
-                        ? 'bg-green-500 hover:bg-green-600' 
-                        : 'bg-blue-500 hover:bg-blue-600'
-                  }`}
-                  onClick={handleVoiceConnection}
-                  disabled={isConnecting}
-                >
-                  <Phone className="h-8 w-8" />
-                </Button>
-                
-                {isConnected && (
-                  <Button
-                    size="icon"
-                    className={`rounded-full w-14 h-14 ${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-500 hover:bg-gray-600'}`}
-                    onClick={toggleListening}
-                    disabled={!isConnected}
-                  >
-                    {isListening ? (
-                      <MicOff className="h-6 w-6" />
-                    ) : (
-                      <Mic className="h-6 w-6" />
-                    )}
-                  </Button>
-                )}
-                
-                <div className="text-center mt-4">
-                  <p className="font-medium mb-1">
-                    {isConnecting ? 'Connecting...' : 
-                     isConnected ? 'Voice Connection Active' : 
-                     'Press to start voice chat'}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {isConnected 
-                      ? (isListening 
-                        ? 'Your microphone is active - speak to chat with AI' 
-                        : 'Your microphone is muted - click to unmute')
-                      : 'Enables real-time voice conversation with AI'}
-                  </p>
-                </div>
-              </div>
-            {/* </TabsContent> */}
-          {/* </Tabs> */}
-        {/* </div> */}
+
+      <div className="flex flex-col items-center space-y-6 py-4">
+        <div className="flex items-center gap-4">
+          <Button
+            size="icon"
+            className={`rounded-full w-20 h-20 ${isConnecting
+                ? 'bg-yellow-500 hover:bg-yellow-600'
+                : isConnected
+                  ? 'bg-red-500 hover:bg-red-600'
+                  : 'bg-blue-500 hover:bg-blue-600'
+              }`}
+            onClick={handleVoiceConnection}
+            disabled={isConnecting}
+          >
+            <Phone className="h-8 w-8" />
+          </Button>
+
+          {isConnected && (
+            <Button
+              size="icon"
+              className={`rounded-full border-gray-200 border-1 w-20 h-20 ${isListening ? 'bg-white hover:bg-gray-100' : 'bg-green-200 hover:bg-green-300'}`}
+              onClick={toggleListening}
+              disabled={!isConnected}
+            >
+              {isListening ? (
+                <MicOff className="h-8 w-8 text-gray-400" />
+              ) : (
+                <Mic className="h-8 w-8 text-gray-400" />
+              )}
+            </Button>
+          )}
+        </div>
+
+        <div className="text-center mt-4">
+          <p className="font-medium mb-1">
+            {isConnecting ? 'Connecting...' :
+              isConnected ? 'Voice Connection Active' :
+                'Press to start voice chat'}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {isConnected
+              ? (isListening
+                ? 'Your microphone is active - speak to chat with AI'
+                : 'Your microphone is muted - click to unmute')
+              : 'Enables real-time voice conversation with AI'}
+          </p>
+        </div>
+      </div>
+      {/* </TabsContent> */}
+      {/* </Tabs> */}
+      {/* </div> */}
       {/* </div> */}
     </PageContainer>
   );
