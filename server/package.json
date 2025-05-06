@@ -1,0 +1,19 @@
+{
+  "name": "srv",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bun build src/index.ts --outdir=dist --minify",
+    "start": "bun run build && bun dist/index.js",
+    "dev": "bun run src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "hono": "^4.7.8"
+  }
+}
