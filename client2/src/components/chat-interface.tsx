@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Mic, MicOff, Power, PowerOff, Loader2, Send, AudioLines, VolumeX, Volume2 } from 'lucide-react';
+import { Mic, MicOff, Power, PowerOff, Loader2, Send, AudioLines, VolumeX, Volume2, ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
 import useWebRtcAi, { VoiceTranscription } from '../hooks/useWebRtcAi';
 import { useChatStore } from '../store/chat-store';
@@ -166,7 +166,7 @@ export function ChatInterface() {
                   className="bg-blue-600 hover:bg-blue-700 text-white h-10 w-20 p-0"
                 >
                   Send
-                  <Send className="h-4 w-4 ml-1" />
+                  <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </form>
             )}
