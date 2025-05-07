@@ -37,13 +37,28 @@ const useWebRtcAi = () => {
             console.error("Data channel not available or not open");
             return false;
         }
-
         try {
-            const message = {
-                type: "text",
-                text: text
+            const msg = {
+                "type": "conversation.item.create",
+                "previous_item_id": null,
+                "item": {
+                    "type": "message",
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            text
+                        }
+                    ]
+                }
             };
-            dataChannelRef.current.send(JSON.stringify(message));
+            dataChannelRef.current.send(JSON.stringify(msg));
+            dataChannelRef.current.send(JSON.stringify({
+                type: "response.create",
+                response: {
+                    modalities: ["text", "audio"],
+                },
+            }));
             return true;
         } catch (error) {
             console.error("Error sending message via data channel:", error);
@@ -172,10 +187,19 @@ const useWebRtcAi = () => {
                             content: msg.transcript,
                             timestamp: new Date()
                         };
-
                         setTranscription(prev => [...prev, newTranscription]);
                         onNewTranscription.current(newTranscription);
                     }
+                    if(msg.type === 'response.done' && msg.response.output[0].content[0].text){
+                        const newTranscription: VoiceTranscription = {
+                            role: 'assistant',
+                            content: msg.response.output[0].content[0].text,
+                            timestamp: new Date()
+                        };
+                        setTranscription(prev => [...prev, newTranscription]);
+                        onNewTranscription.current(newTranscription);
+                    }
+                        
                 } catch (error) {
                     console.error("Error parsing data channel message:", error);
                 }

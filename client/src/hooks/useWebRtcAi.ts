@@ -39,11 +39,31 @@ const useWebRtcAi = () => {
         }
 
         try {
-            const message = {
-                type: "text",
-                text: text
+            const msg = {
+                type: 'conversation.item.create',
+                response: {
+                    modalities: ["text"],
+                    input: [
+                        {
+                            type: "message",
+                            role: "user",
+                            content: [
+                                {
+                                    type: "input_text",
+                                    text,
+                                },
+                            ],
+                        },
+                    ],
+                },
             };
-            dataChannelRef.current.send(JSON.stringify(message));
+            dataChannelRef.current.send(JSON.stringify(msg));
+            dataChannelRef.current.send(JSON.stringify({
+                type: "response.create",
+                response: {
+                    modalities: ["text"]
+                },
+            }));
             return true;
         } catch (error) {
             console.error("Error sending message via data channel:", error);
