@@ -23,6 +23,7 @@ const useWebRtcAi = () => {
     const [isConnected, setIsConnected] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isListening, setIsListening] = useState(false);
+    const [isAssistantMuted, setIsAssistantMuted] = useState(false);
     const [transcription, setTranscription] = useState<VoiceTranscription[]>([]);
 
     const onNewTranscription = useRef<(message: VoiceTranscription) => void>(() => { });
@@ -296,6 +297,16 @@ const useWebRtcAi = () => {
         };
     }, [disconnect]);
 
+    const toggleAssistantMute = useCallback(() => {
+        setIsAssistantMuted(prev => {
+            const newMuted = !prev;
+            if (audioElementRef.current) {
+                audioElementRef.current.muted = newMuted;
+            }
+            return newMuted;
+        });
+    }, []);
+
     return {
         init,
         disconnect,
@@ -306,7 +317,9 @@ const useWebRtcAi = () => {
         isConnecting,
         isConnected,
         isListening,
-        error
+        error,
+        isAssistantMuted,
+        toggleAssistantMute,
     };
 };
 
