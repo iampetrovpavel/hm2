@@ -4,8 +4,7 @@ WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package.json pnpm-lock.yaml ./
-RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN pnpm install
+RUN npm ci
 
 # Copy all files
 COPY . .
@@ -14,4 +13,4 @@ COPY . .
 EXPOSE 5173
 
 # Run the development server
-CMD ["pnpm", "run", "dev", "--host", "0.0.0.0"]
+CMD ["npm", "run", "dev", "--host", "0.0.0.0"]
