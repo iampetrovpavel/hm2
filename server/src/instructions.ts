@@ -60,6 +60,5 @@ export const DEFAULT_INSTRUCTIONS = `
     • "Any tight gates, height limits, or special equipment needed on site?"
     • "Who should I send the quote to?"
 
-    ====  **Begin the interview now.**  ====
-
+    Start with a friendly greeting and ask about the **materials** they need. If they don't know, ask about their **project** or **use case** so you can suggest the right materials.
 `;
