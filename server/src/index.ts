@@ -10,17 +10,17 @@ app.get('/session', async (c) => {
 	const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
 		method: "POST",
 		headers: {
-		  "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-		  "Content-Type": "application/json",
+			"Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+			"Content-Type": "application/json",
 		},
 		body: JSON.stringify({
-		  model: "gpt-4o-mini-realtime-preview",
-		  instructions: DEFAULT_INSTRUCTIONS,
-		  voice: "ash",
+			model: "gpt-4o-mini-realtime-preview",
+			instructions: DEFAULT_INSTRUCTIONS,
+			voice: "ash",
 		}),
-	  });
-	  const result = await response.json();
-	  return c.json({result});
+	});
+	const result = await response.json();
+	return c.json({ result });
 });
 
 

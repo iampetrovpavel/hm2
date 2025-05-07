@@ -59,6 +59,4 @@ export const DEFAULT_INSTRUCTIONS = `
     • "Which city or ZIP should I plan the delivery for?"
     • "Any tight gates, height limits, or special equipment needed on site?"
     • "Who should I send the quote to?"
-
-    Start with a friendly greeting and ask about the **materials** they need. If they don't know, ask about their **project** or **use case** so you can suggest the right materials.
 `;

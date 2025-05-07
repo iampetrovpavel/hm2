@@ -112,6 +112,14 @@ const useWebRtcAi = () => {
                     },
                 }
                 dc.send(JSON.stringify(event));
+                const msg = {
+                    type: 'response.create',
+                    "response": {
+                        "modalities": ["text", "audio"],
+                        "instructions": "Start with a friendly greeting and ask about the **materials** they need. If they don't know, ask about their **project** or **use case** so you can suggest the right materials.",
+                    }
+                }
+                dc.send(JSON.stringify(msg));
                 console.log('Session update sent.');
             };
 
@@ -119,7 +127,7 @@ const useWebRtcAi = () => {
                 // Realtime server events appear here!
                 try {
                     const msg: DataChannelMessage = JSON.parse(e.data);
-                    // console.log(msg);
+                    console.log(msg);
 
                     if (msg.type === 'response.audio_transcript.done' && msg.transcript) {
                         const newTranscription: VoiceTranscription = {
@@ -131,7 +139,7 @@ const useWebRtcAi = () => {
                         setTranscription(prev => [...prev, newTranscription]);
                         onNewTranscription.current(newTranscription);
                     }
-                    if(msg.type === 'conversation.item.input_audio_transcription.completed'){
+                    if (msg.type === 'conversation.item.input_audio_transcription.completed') {
                         const newTranscription: VoiceTranscription = {
                             role: 'user',
                             content: msg.transcript,
