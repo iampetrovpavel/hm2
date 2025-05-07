@@ -1,16 +1,16 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 
 export interface VoiceTranscription {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp: Date;
 }
 
 interface DataChannelMessage {
-  type: string;
-  content?: string;
-  role?: string;
-  [key: string]: any;
+    type: string;
+    content?: string;
+    role?: string;
+    [key: string]: any;
 }
 
 const useWebRtcAi = () => {
@@ -25,7 +25,7 @@ const useWebRtcAi = () => {
     const [isListening, setIsListening] = useState(false);
     const [transcription, setTranscription] = useState<VoiceTranscription[]>([]);
 
-    const onNewTranscription = useRef<(message: VoiceTranscription) => void>(() => {});
+    const onNewTranscription = useRef<(message: VoiceTranscription) => void>(() => { });
 
     const setTranscriptionCallback = useCallback((callback: (message: VoiceTranscription) => void) => {
         onNewTranscription.current = callback;
@@ -57,6 +57,7 @@ const useWebRtcAi = () => {
             setError(null);
 
             // Get an ephemeral key from your server - see server code below
+            //@ts-ignore
             const tokenResponse = await fetch(`${import.meta.env.VITE_SERVER_URL}/session`);
             const { result } = await tokenResponse.json();
             const EPHEMERAL_KEY = result?.client_secret.value;
@@ -98,20 +99,45 @@ const useWebRtcAi = () => {
             // Set up data channel for sending and receiving events
             const dc = pc.createDataChannel("oai-events");
             dataChannelRef.current = dc;
-            
+
+            dc.onopen = () => {
+                console.log("Data channel is open");
+                const event = {
+                    type: 'session.update',
+                    session: {
+                        modalities: ['text', 'audio'],
+                        input_audio_transcription: {
+                            model: 'whisper-1',
+                        },
+                    },
+                }
+                dc.send(JSON.stringify(event));
+                console.log('Session update sent.');
+            };
+
             dc.addEventListener("message", (e) => {
                 // Realtime server events appear here!
                 try {
                     const msg: DataChannelMessage = JSON.parse(e.data);
-                    console.log(msg);
-                    
+                    // console.log(msg);
+
                     if (msg.type === 'response.audio_transcript.done' && msg.transcript) {
                         const newTranscription: VoiceTranscription = {
-                            role: msg.role as 'user' | 'assistant' || 'user',
+                            role: 'assistant',
                             content: msg.transcript,
                             timestamp: new Date()
                         };
-                        
+
+                        setTranscription(prev => [...prev, newTranscription]);
+                        onNewTranscription.current(newTranscription);
+                    }
+                    if(msg.type === 'conversation.item.input_audio_transcription.completed'){
+                        const newTranscription: VoiceTranscription = {
+                            role: 'user',
+                            content: msg.transcript,
+                            timestamp: new Date()
+                        };
+
                         setTranscription(prev => [...prev, newTranscription]);
                         onNewTranscription.current(newTranscription);
                     }
@@ -156,7 +182,7 @@ const useWebRtcAi = () => {
 
     const toggleListening = useCallback(() => {
         if (!mediaStreamRef.current || !isConnected) return;
-        
+
         if (isListening) {
             // Mute the microphone
             mediaStreamRef.current.getTracks().forEach(track => {
@@ -176,7 +202,7 @@ const useWebRtcAi = () => {
         setIsConnected(false);
         setIsListening(false);
         setIsConnecting(false);
-        
+
         // Close the data channel
         if (dataChannelRef.current) {
             dataChannelRef.current.close();
@@ -211,8 +237,8 @@ const useWebRtcAi = () => {
         };
     }, [disconnect]);
 
-    return { 
-        init, 
+    return {
+        init,
         disconnect,
         toggleListening,
         setTranscriptionCallback,
