@@ -5,7 +5,7 @@
   "scripts": {
     "build": "bun build src/index.ts --outdir=dist --minify",
     "start": "bun run build && bun dist/index.js",
-    "dev": "bun run src/index.ts"
+    "dev": "bun run src/index.ts --hot --watch"
   },
   "devDependencies": {
     "@types/bun": "latest"

@@ -31,13 +31,14 @@ app.get('/session', async (c) => {
 
 app.post('/collect', async (c) => {
 	const { messages } = await c.req.json();
-	
+	const payload: Array<{ role: "system" | "user" | "assistant"; content: string; name?: string }> = [
+		{ role: "system", content: INSTRUCTIONS_COLLECTOR },
+		{ role: "user", content: `${messages.map((message: any) => `${message.role}: ${message.content}`).join("\n")}` },
+	];
+	console.log("payload", payload);
 	const completion = await openai.chat.completions.create({
-		model: "gpt-4o",
-		messages: [
-			{ role: "system", content: INSTRUCTIONS_COLLECTOR },
-			...messages
-		],
+		model: "gpt-4.1",
+		messages: payload,
 	});
 	
 	return c.json(completion.choices[0].message);

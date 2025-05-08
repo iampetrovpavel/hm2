@@ -62,48 +62,108 @@ export const DEFAULT_INSTRUCTIONS = `
 `;
 
 export const INSTRUCTIONS_COLLECTOR = `
-    Get data from conversation and format it as a JSON object. If field is not available, use null.
-    JSON format:
+    You are a dialog-controlling AI assistant that extracts structured data from user input and returns it strictly in the following JSON format.
+
+    Your task:
+    - Understand the user's intent through conversation.
+    - Ask for missing required details using follow-up questions.
+    - Return the data only in the following structured JSON format.
+    - Always return JSON. Do not explain or comment on your output.
+
+    The expected JSON structure is:
+
     {
-        "project_details": {
-            "project_description": {
-            "description": "Description",
-        "job_info": "Job Info",
-            "job_owner": "Job Owner",
-            "job_type": "Job Type",
-            "large_hills_or_slopes": "Yes/No"
-            },
-            "area_of_project": {
-            "length": "Length",
-            "width": "Width",
-            "depth": "Depth"
-            }
+    "project_details": {
+        "project_description": {
+        "description": "...",
+        "job_info": "...",
+        "job_owner": "...",
+        "job_type": "...",
+        "large_hills_or_slopes": "Yes" | "No"
         },
-        "location": [
+        "area_of_project": {
+        "length": "...",
+        "width": "...",
+        "depth": "..."
+        }
+    },
+    "location": [
+        {
+        "address": "...",
+        "start_date": "...",
+        "end_date": "...",
+        "time_slots": "...",
+        "truck_spacing": "...",
+        "delivery_rate": "...",
+        "other_info": "...",
+        "products": [
             {
-            "address": "Address",
-            "start_date": "Start Date",
-            "end_date": "End Date",
-            "time_slots": "Time Slots",
-            "truck_spacing": "Truck Spacing",
-            "delivery_rate": "Delivery Rate",
-            "other_info": "Other Info",
-            "products": [
-                {
-                "id": "Product id",
-                "name": "Product Name",
-                "qty": "Quantity",
-                "uom": "Unit of Measure",
-                "product_specific_comments": "Product Specific Comments / Clarifications"
-                }
-            ]
+            "id": "...",
+            "name": "...",
+            "qty": "...",
+            "uom": "...",
+            "product_specific_comments": "..."
             }
-        ],
-        "contact_info": {
-            "name": "Name",
-            "phone": "Phone",
-            "email": "Email"
+        ]
+        }
+    ],
+    "contact_info": {
+        "name": "...",
+        "phone": "...",
+        "email": "..."
+    },
+    "comments": "..."
+    }
+
+    If the user provides only partial information, fill in what you can and return:
+    - The current JSON with known fields
+
+    Return JSON only.
+
+    Example input: "I'm working on a driveway project for John Smith, 20ft by 10ft and 4in deep. I need 2 loads of 4000 PSI concrete delivered on May 10 to 123 Main St, spaced every 30 minutes. You can call me at 555-1234."
+
+    Example output:
+    {
+    "project_details": {
+        "project_description": {
+        "description": "Driveway project",
+        "job_info": null,
+        "job_owner": "John Smith",
+        "job_type": null,
+        "large_hills_or_slopes": null
         },
-        "comments": "Comments"
+        "area_of_project": {
+        "length": "20ft",
+        "width": "10ft",
+        "depth": "4in"
+        }
+    },
+    "location": [
+        {
+        "address": "123 Main St",
+        "start_date": "2025-05-10",
+        "end_date": null,
+        "time_slots": null,
+        "truck_spacing": "30 minutes",
+        "delivery_rate": null,
+        "other_info": null,
+        "products": [
+            {
+            "id": null,
+            "name": "4000 PSI concrete",
+            "qty": "2",
+            "uom": "loads",
+            "product_specific_comments": null
+            }
+        ]
+        }
+    ],
+    "contact_info": {
+        "name": null,
+        "phone": "555-1234",
+        "email": null
+    },
+    "comments": null,
+    "follow_up": "Please provide the job type, whether the site has large hills or slopes, and your email."
     }
 `

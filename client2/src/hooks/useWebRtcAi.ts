@@ -1,4 +1,5 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
+import { collectService } from '../lib/utils';
 
 export interface VoiceTranscription {
     role: 'user' | 'assistant';
@@ -170,34 +171,42 @@ const useWebRtcAi = () => {
                 // Realtime server events appear here!
                 try {
                     const msg: DataChannelMessage = JSON.parse(e.data);
-                    console.log(msg);
+                    // console.log(msg);
 
                     if (msg.type === 'response.audio_transcript.done' && msg.transcript) {
+                        // console.log(msg);
                         const newTranscription: VoiceTranscription = {
                             role: 'assistant',
                             content: msg.transcript,
                             timestamp: new Date()
                         };
-
-                        setTranscription(prev => [...prev, newTranscription]);
                         onNewTranscription.current(newTranscription);
                     }
                     if(msg.type === 'conversation.item.input_audio_transcription.completed'){
+                        // console.log(msg);
                         const newTranscription: VoiceTranscription = {
                             role: 'user',
                             content: msg.transcript,
                             timestamp: new Date()
                         };
-                        setTranscription(prev => [...prev, newTranscription]);
+                        setTranscription(prev => {
+                            const updatedTranscriptions = [...prev, newTranscription];
+                            return updatedTranscriptions;
+                        });
+                        collectService.sendMessagesToBackend([...transcription, newTranscription]).then((data) => {
+                            console.log("Messages sent to backend successfully", JSON.parse(data.content));
+                        }).catch((error) => {
+                            console.error("Error sending messages to backend:", error);
+                        });
                         onNewTranscription.current(newTranscription);
                     }
                     if(msg.type === 'response.done' && msg.response.output[0].content[0].text){
+                        // console.log(msg);
                         const newTranscription: VoiceTranscription = {
                             role: 'assistant',
                             content: msg.response.output[0].content[0].text,
                             timestamp: new Date()
                         };
-                        setTranscription(prev => [...prev, newTranscription]);
                         onNewTranscription.current(newTranscription);
                     }
                         

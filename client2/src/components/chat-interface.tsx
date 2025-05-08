@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import useWebRtcAi, { VoiceTranscription } from '../hooks/useWebRtcAi';
 import { useChatStore } from '../store/chat-store';
 import { Header } from './header';
+import ReactMarkdown from 'react-markdown'
 
 export function ChatInterface() {
   const webRtc = useWebRtcAi();
@@ -72,7 +73,7 @@ export function ChatInterface() {
                     : 'bg-white text-gray-900'
                     }`}
                 >
-                  <p>{message.content}</p>
+                  <p><ReactMarkdown>{message.content}</ReactMarkdown></p>
                   <span className="text-xs opacity-75">
                     {new Date(message.timestamp).toLocaleTimeString()}
                   </span>
