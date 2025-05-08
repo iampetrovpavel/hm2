@@ -1,5 +1,6 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 import { collectService } from '../lib/utils';
+import { jsonrepair } from 'jsonrepair'
 
 export interface VoiceTranscription {
     role: 'user' | 'assistant';
@@ -32,6 +33,8 @@ const useWebRtcAi = () => {
     const setTranscriptionCallback = useCallback((callback: (message: VoiceTranscription) => void) => {
         onNewTranscription.current = callback;
     }, []);
+
+    const gettingData = useRef(false);
 
     // Send text message to be spoken by AI
     const sendTextMessage = useCallback((text: string) => {
@@ -180,6 +183,7 @@ const useWebRtcAi = () => {
                             content: msg.transcript,
                             timestamp: new Date()
                         };
+                        setTranscription(prev => [...prev, newTranscription]);
                         onNewTranscription.current(newTranscription);
                     }
                     if(msg.type === 'conversation.item.input_audio_transcription.completed'){
@@ -191,12 +195,18 @@ const useWebRtcAi = () => {
                         };
                         setTranscription(prev => {
                             const updatedTranscriptions = [...prev, newTranscription];
+                            // Send the updated transcriptions to the backend
+                            if(gettingData.current === false) {
+                                gettingData.current = true;
+                                collectService.sendMessagesToBackend([...prev, newTranscription]).then((data) => {
+                                    console.log("===DATA===", JSON.parse(jsonrepair(data.content)));
+                                }).catch((error) => {
+                                    console.error("Error sending messages to backend:", error);
+                                }).finally(() => {
+                                    gettingData.current = false;
+                                });
+                            }
                             return updatedTranscriptions;
-                        });
-                        collectService.sendMessagesToBackend([...transcription, newTranscription]).then((data) => {
-                            console.log("Messages sent to backend successfully", JSON.parse(data.content));
-                        }).catch((error) => {
-                            console.error("Error sending messages to backend:", error);
                         });
                         onNewTranscription.current(newTranscription);
                     }
@@ -207,6 +217,7 @@ const useWebRtcAi = () => {
                             content: msg.response.output[0].content[0].text,
                             timestamp: new Date()
                         };
+                        setTranscription(prev => [...prev, newTranscription]);
                         onNewTranscription.current(newTranscription);
                     }
                         

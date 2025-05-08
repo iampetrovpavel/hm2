@@ -6,6 +6,12 @@ import { useChatStore } from '../store/chat-store';
 import { Header } from './header';
 import ReactMarkdown from 'react-markdown'
 
+const ButtonText = ({ children }: { children: React.ReactNode }) => (
+  <span className="hidden sm:inline">
+    {children}
+  </span>
+);
+
 export function ChatInterface() {
   const webRtc = useWebRtcAi();
   const { messages, addMessage, setIsConnected, setIsListening, clearMessages } = useChatStore();
@@ -73,7 +79,7 @@ export function ChatInterface() {
                     : 'bg-white text-gray-900'
                     }`}
                 >
-                  <p><ReactMarkdown>{message.content}</ReactMarkdown></p>
+                  <div><ReactMarkdown>{message.content}</ReactMarkdown></div>
                   <span className="text-xs opacity-75">
                     {new Date(message.timestamp).toLocaleTimeString()}
                   </span>
@@ -91,7 +97,7 @@ export function ChatInterface() {
                 onClick={webRtc.isConnected ? handleDisconnect : handleConnect}
                 variant={webRtc.isConnected ? "destructive" : "default"}
                 disabled={webRtc.isConnecting}
-                className="min-w-[120px]"
+                className="min-w-[40px]"
               >
                 {webRtc.isConnecting ? (
                   <>
@@ -101,7 +107,7 @@ export function ChatInterface() {
                 ) : webRtc.isConnected ? (
                   <>
                     <PowerOff className="mr-2 h-4 w-4" />
-                    Disconnect
+                    <ButtonText>Disconnect</ButtonText>
                   </>
                 ) : (
                   <>
@@ -115,34 +121,34 @@ export function ChatInterface() {
                   <Button
                     onClick={webRtc.toggleListening}
                     variant={webRtc.isListening ? "destructive" : "default"}
-                    className="min-w-[120px]"
+                    className="min-w-[40px]"
                   >
                     {webRtc.isListening ? (
                       <>
-                        <MicOff className="mr-2 h-4 w-4" />
-                        Stop Listening
+                        <MicOff className="mr-2 h-4" />
+                        <ButtonText>Stop Listening</ButtonText>
                       </>
                     ) : (
                       <>
                         <Mic className="mr-2 h-4 w-4" />
-                        Start Listening
+                        <ButtonText>Start Listening</ButtonText>
                       </>
                     )}
                   </Button>
                   <Button
                     onClick={webRtc.toggleAssistantMute}
                     variant={webRtc.isAssistantMuted ? "destructive" : "default"}
-                    className="min-w-[120px]"
+                    className="min-w-[40px]"
                   >
                     {webRtc.isAssistantMuted ? (
                       <>
                         <VolumeX className="mr-2 h-4 w-4" />
-                        Unmute Assistant
+                        <ButtonText>Unmute Assistant</ButtonText>
                       </>
                     ) : (
                       <>
                         <Volume2 className="mr-2 h-4 w-4" />
-                        Mute Assistant
+                        <ButtonText>Mute Assistant</ButtonText>
                       </>
                     )}
                   </Button>

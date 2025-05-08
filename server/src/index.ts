@@ -33,7 +33,7 @@ app.post('/collect', async (c) => {
 	const { messages } = await c.req.json();
 	const payload: Array<{ role: "system" | "user" | "assistant"; content: string; name?: string }> = [
 		{ role: "system", content: INSTRUCTIONS_COLLECTOR },
-		{ role: "user", content: `${messages.map((message: any) => `${message.role}: ${message.content}`).join("\n")}` },
+		{ role: "user", content: `${messages.filter((m: any)=>m.role === 'assistant').map((message: any) => `${message.content}`).join("\n")}` },
 	];
 	console.log("payload", payload);
 	const completion = await openai.chat.completions.create({
