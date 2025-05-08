@@ -9,53 +9,9 @@ import { Header } from './header';
 import { useNavigate } from 'react-router-dom';
 import { ProjectData } from '../types';
 
-const projectData: ProjectData = {
-  project_details: {
-      project_description: {
-          description: "Delivery of cement",
-          job_info: null,
-          job_owner: null,
-          job_type: null,
-          large_hills_or_slopes: null
-      },
-      area_of_project: {
-          length: "",
-          width: "",
-          depth: ""
-      }
-  },
-  location: [
-      {
-          address: "New York City",
-          start_date: "2025-02-03",
-          end_date: null,
-          time_slots: null,
-          truck_spacing: "",
-          delivery_rate: null,
-          other_info: null,
-          products: [
-              {
-                  id: null,
-                  name: "Type I cement",
-                  qty: 2,
-                  uom: "tons",
-                  product_specific_comments: null
-              }
-          ]
-      }
-  ],
-  contact_info: {
-      name: null,
-      phone: "",
-      email: null
-  },
-  comments: null,
-  completed: false
-}
-
 export function RequestPage() {
   const { 
-    // projectData, 
+    projectData, 
     updateLocation, 
     addLocation, 
     removeLocation, 
@@ -564,4 +520,48 @@ export function RequestPage() {
       </div>
     </div>
   );
+}
+
+const projectData: ProjectData = {
+  project_details: {
+      project_description: {
+          description: "Delivery of cement",
+          job_info: null,
+          job_owner: null,
+          job_type: null,
+          large_hills_or_slopes: null
+      },
+      area_of_project: {
+          length: "",
+          width: "",
+          depth: ""
+      }
+  },
+  location: [
+      {
+          address: "New York City",
+          start_date: "2025-02-03",
+          end_date: null,
+          time_slots: null,
+          truck_spacing: "",
+          delivery_rate: null,
+          other_info: null,
+          products: [
+              {
+                  id: null,
+                  name: "Type I cement",
+                  qty: 2,
+                  uom: "tons",
+                  product_specific_comments: null
+              }
+          ]
+      }
+  ],
+  contact_info: {
+      name: null,
+      phone: "",
+      email: null
+  },
+  comments: null,
+  completed: false
 }
