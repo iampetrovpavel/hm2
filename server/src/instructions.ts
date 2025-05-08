@@ -60,3 +60,50 @@ export const DEFAULT_INSTRUCTIONS = `
     • "Any tight gates, height limits, or special equipment needed on site?"
     • "Who should I send the quote to?"
 `;
+
+export const INSTRUCTIONS_COLLECTOR = `
+    Get data from conversation and format it as a JSON object. If field is not available, use null.
+    JSON format:
+    {
+        "project_details": {
+            "project_description": {
+            "description": "Description",
+        "job_info": "Job Info",
+            "job_owner": "Job Owner",
+            "job_type": "Job Type",
+            "large_hills_or_slopes": "Yes/No"
+            },
+            "area_of_project": {
+            "length": "Length",
+            "width": "Width",
+            "depth": "Depth"
+            }
+        },
+        "location": [
+            {
+            "address": "Address",
+            "start_date": "Start Date",
+            "end_date": "End Date",
+            "time_slots": "Time Slots",
+            "truck_spacing": "Truck Spacing",
+            "delivery_rate": "Delivery Rate",
+            "other_info": "Other Info",
+            "products": [
+                {
+                "id": "Product id",
+                "name": "Product Name",
+                "qty": "Quantity",
+                "uom": "Unit of Measure",
+                "product_specific_comments": "Product Specific Comments / Clarifications"
+                }
+            ]
+            }
+        ],
+        "contact_info": {
+            "name": "Name",
+            "phone": "Phone",
+            "email": "Email"
+        },
+        "comments": "Comments"
+    }
+`

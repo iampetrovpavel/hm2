@@ -211,6 +211,7 @@ const useWebRtcAi = () => {
             await pc.setLocalDescription(offer);
 
             const baseUrl = "https://api.openai.com/v1/realtime";
+            // const model = "gpt-4o-realtime-preview";
             const model = "gpt-4o-mini-realtime-preview";
             const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
                 method: "POST",
