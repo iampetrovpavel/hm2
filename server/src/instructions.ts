@@ -143,97 +143,97 @@ export const INSTRUCTIONS_COLLECTOR = `
     The expected JSON structure is:
 
     {
-    "project_details": {
-        "project_description": {
-        "description": "...",
-        "job_info": "...",
-        "job_owner": "...",
-        "job_type": "...",
-        "large_hills_or_slopes": "Yes" | "No"
+        "project_details": {
+            "project_description": {
+            "description": string,
+            "job_info": string,
+            "job_owner": string,
+            "job_type": string,
+            "large_hills_or_slopes": boolean
+            "area_of_project": {
+                "length": "...",
+                "width": "...",
+                "depth": "..."
+            }
         },
-        "area_of_project": {
-        "length": "...",
-        "width": "...",
-        "depth": "..."
-        }
-    },
-    "location": [
-        {
-        "address": "...",
-        "start_date": "...",
-        "end_date": "...",
-        "time_slots": "...",
-        "truck_spacing": "...",
-        "delivery_rate": "...",
-        "other_info": "...",
-        "products": [
+        "location": [
             {
-            "id": "...",
+            "address": "...",
+            "start_date": "...",
+            "end_date": "...",
+            "time_slots": "...",
+            "truck_spacing": "...",
+            "delivery_rate": "...",
+            "other_info": "...",
+            "products": [
+                {
+                    "id": "...",
+                    "name": "...",
+                    "qty": number,
+                    "uom": string,
+                    "product_specific_comments": "..."
+                }
+            ]
+            }
+        ],
+        "contact_info": {
             "name": "...",
-            "qty": "...",
-            "uom": "...",
-            "product_specific_comments": "..."
-            }
-        ]
-        }
-    ],
-    "contact_info": {
-        "name": "...",
-        "phone": "...",
-        "email": "..."
-    },
-    "comments": "..."
-    }
-
-    If the user provides only partial information, fill in what you can and return:
-    - The current JSON with known fields
-
-    Return JSON only.
-
-    Example input: "I'm working on a driveway project for John Smith, 20ft by 10ft and 4in deep. I need 2 loads of 4000 PSI concrete delivered on May 10 to 123 Main St, spaced every 30 minutes. You can call me at 555-1234."
-
-    Example output:
-    {
-    "project_details": {
-        "project_description": {
-        "description": "Driveway project",
-        "job_info": null,
-        "job_owner": "John Smith",
-        "job_type": null,
-        "large_hills_or_slopes": null
+            "phone": "...",
+            "email": "..."
         },
-        "area_of_project": {
-        "length": "20ft",
-        "width": "10ft",
-        "depth": "4in"
-        }
-    },
-    "location": [
-        {
-        "address": "123 Main St",
-        "start_date": "2025-05-10",
-        "end_date": null,
-        "time_slots": null,
-        "truck_spacing": "30 minutes",
-        "delivery_rate": null,
-        "other_info": null,
-        "products": [
-            {
-            "id": null,
-            "name": "4000 PSI concrete",
-            "qty": "2",
-            "uom": "loads",
-            "product_specific_comments": null
-            }
-        ]
-        }
-    ],
-    "contact_info": {
-        "name": null,
-        "phone": "555-1234",
-        "email": null
-    },
-    "comments": null,
-    "follow_up": "Please provide the job type, whether the site has large hills or slopes, and your email."
+        "comments": "...",
+        "completed": boolean
     }
+
+        If the user provides only partial information, fill in the missing fields with "null" or "unknown" as appropriate.:
+        Return exactly the same JSON ыекгсегку only.
+
+        Example input: "I'm working on a driveway project for John Smith, 20ft by 10ft and 4in deep. I need 2 loads of 4000 PSI concrete delivered on May 10 to 123 Main St, spaced every 30 minutes. You can call me at 555-1234."
+
+        Example output:
+        {
+        "project_details": {
+            "project_description": {
+            "description": "Driveway project",
+            "job_info": null,
+            "job_owner": "John Smith",
+            "job_type": null,
+            "large_hills_or_slopes": null
+            },
+            "area_of_project": {
+            "length": "20ft",
+            "width": "10ft",
+            "depth": "4in"
+            }
+        },
+        "location": [
+            {
+            "address": "123 Main St",
+            "start_date": "2025-05-10",
+            "end_date": null,
+            "time_slots": null,
+            "truck_spacing": "30 minutes",
+            "delivery_rate": null,
+            "other_info": null,
+            "products": [
+                {
+                "id": null,
+                "name": "4000 PSI concrete",
+                "qty": 2,
+                "uom": "loads",
+                "product_specific_comments": null
+                }
+            ]
+            }
+        ],
+        "contact_info": {
+            "name": null,
+            "phone": "555-1234",
+            "email": null
+        },
+        "comments": null,
+        "completed": true
+    }
+
+    Once the user confirms that all information is correct, set the "completed" field to true and return the JSON again.
 `
