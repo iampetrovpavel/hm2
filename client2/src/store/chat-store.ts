@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { VoiceTranscription } from '../hooks/useWebRtcAi'
+import { VoiceTranscription } from '../types'
 
 interface ChatState {
   messages: VoiceTranscription[]

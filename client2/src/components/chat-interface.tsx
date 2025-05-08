@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Mic, MicOff, Power, PowerOff, Loader2, Send, AudioLines, VolumeX, Volume2, ArrowRight } from 'lucide-react';
+import { Mic, MicOff, Power, PowerOff, Loader2, FileText, AudioLines, VolumeX, Volume2, ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
-import useWebRtcAi, { VoiceTranscription } from '../hooks/useWebRtcAi';
+import useWebRtcAi from '../hooks/useWebRtcAi';
 import { useChatStore } from '../store/chat-store';
 import { Header } from './header';
 import ReactMarkdown from 'react-markdown'
+import { VoiceTranscription } from '../types';
 
 const ButtonText = ({ children }: { children: React.ReactNode }) => (
   <span className="hidden sm:inline">
@@ -153,6 +154,15 @@ export function ChatInterface() {
                     )}
                   </Button>
                 </>
+              )}
+              {!webRtc.projectData?.completed && (
+                <Button
+                  variant={webRtc.isAssistantMuted ? "destructive" : "default"}
+                  className="min-w-[40px]"
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  <ButtonText>View request</ButtonText>
+                </Button>
               )}
             </div>
 
