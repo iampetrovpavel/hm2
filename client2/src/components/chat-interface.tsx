@@ -3,9 +3,11 @@ import { Mic, MicOff, Power, PowerOff, Loader2, FileText, AudioLines, VolumeX, V
 import { Button } from './ui/button';
 import useWebRtcAi from '../hooks/useWebRtcAi';
 import { useChatStore } from '../store/chat-store';
+import { useRequestStore } from '../store/request-store';
 import { Header } from './header';
 import ReactMarkdown from 'react-markdown'
 import { VoiceTranscription } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 const ButtonText = ({ children }: { children: React.ReactNode }) => (
   <span className="hidden sm:inline">
@@ -16,9 +18,11 @@ const ButtonText = ({ children }: { children: React.ReactNode }) => (
 export function ChatInterface() {
   const webRtc = useWebRtcAi();
   const { messages, addMessage, setIsConnected, setIsListening, clearMessages } = useChatStore();
+  const { setProjectData } = useRequestStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [textMessage, setTextMessage] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -155,9 +159,13 @@ export function ChatInterface() {
                   </Button>
                 </>
               )}
-              {!webRtc.projectData?.completed && (
+              {webRtc.projectData?.completed === true && (
                 <Button
-                  variant={webRtc.isAssistantMuted ? "destructive" : "default"}
+                  onClick={() => {
+                    setProjectData(webRtc.projectData!)
+                    navigate('/request')
+                  }}
+                  variant="secondary"
                   className="min-w-[40px]"
                 >
                   <FileText className="mr-2 h-4 w-4" />
